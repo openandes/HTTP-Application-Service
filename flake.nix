@@ -44,7 +44,7 @@
       });
 
       ## 2. The Application Output (The executable wrapper for running)
-      apps = forAllSystems (system: {
+      apps = forAllSystems (system: pkgs: {
         default = {
           type = "app";
           program = "${
