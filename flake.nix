@@ -15,47 +15,47 @@
       supportedSystems = [ "x86_64-linux" "aarch64-linux" ];
 
       # Helper function to generate outputs for all supported systems
-      forAllSystems = nixpkgs.lib.genAttrs supportedSystems;
+      # This helper passes (system, pkgs) to the function 'f'
+      forAllSystems = f:
+        nixpkgs.lib.genAttrs supportedSystems
+        (system: f system (import nixpkgs { inherit system; }));
 
-      # Global 'pkgs' set: Maps "system" -> "nixpkgs instance"
-      pkgs = forAllSystems (system: import nixpkgs {
-        inherit system;
-      });
     in {
-      
+
       ## 1. The Package Output (The compiled executable)
-      packages = forAllSystems (system:
-        let
-          # RESOLUTION: Use a unique name here to avoid shadowing the global 'pkgs'
-          systemPkgs = pkgs.${system}; 
-        in {
-          default = systemPkgs.buildGoModule rec {
-            pname = "open-andes-http";
+      # ✅ FIX 1: The function must accept pkgs as the second argument.
+      # ✅ FIX 3: The body must be a set { ... }
+      packages = forAllSystems (system: pkgs: {
+        default =
+          pkgs.buildGoModule rec { # ✅ FIX 2: Use 'pkgs' instead of the undefined 'systemPkgs'
+            pname = "open-andes-http-application-service";
             version = "0.1.0";
-            
+
             src = ./.;
             # NOTE: Update this hash after the first build attempt
             vendorHash = null;
-            
-            meta = with systemPkgs.lib; {
-              description = "Open Andes HTTP Application Service";
-              license = licenses.agpl3;
-            };
+
+            meta =
+              with pkgs.lib; { # ✅ FIX 2: Use 'pkgs.lib' instead of 'systemPkgs.lib'
+                description = "Open Andes HTTP Application Service";
+                license = licenses.agpl3;
+              };
           };
-        }
-      );
+      });
 
       ## 2. The Application Output (The executable wrapper for running)
       apps = forAllSystems (system: {
         default = {
           type = "app";
-          program = "${self.packages.${system}.default}/bin/open-andes-http";
+          program = "${
+              self.packages.${system}.default
+            }/bin/open-andes-http-application-service";
         };
       });
 
       ## 3. The Development Shell (Re-uses the Go environment)
-      devShells = forAllSystems (system: {
-        default = gnu-nix-go.devShells.${system}.default;
-      });
+      # ✅ FIX 1: The function must accept pkgs as the second argument.
+      devShells = forAllSystems
+        (system: pkgs: { default = gnu-nix-go.devShells.${system}.default; });
     };
 }
