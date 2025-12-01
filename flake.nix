@@ -35,7 +35,7 @@
             
             src = ./.;
             # NOTE: Update this hash after the first build attempt
-            vendorHash = "sha256-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=";
+            vendorHash = null;
             
             meta = with systemPkgs.lib; {
               description = "Open Andes HTTP Application Service";
