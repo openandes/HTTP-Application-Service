@@ -1,3 +1,3 @@
-module github.com/openandes/HTTP-Application-Service 
+module github.com/openandes/http-application-service 
 
 go 1.21
