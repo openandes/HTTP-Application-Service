@@ -45,7 +45,7 @@
       apps = forAllSystems (system: pkgs: {
         default = {
           type = "app";
-	  program = "${self.packages.${system}.default}/open-andes-http-application-service";
+	  program = "${self.packages.${system}.default}/bin/http-application-service";
         };
       });
 
