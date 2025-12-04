@@ -25,7 +25,7 @@
       ## 1. The Package Output (The compiled executable)
       packages = forAllSystems (system: pkgs: {
         default =
-          pkgs.buildGoModule rec { 
+	    gnu-nix-go.lib.buildGo rec { 
             pname = "open-andes-http-application-service";
             version = "0.1.0";
 
@@ -45,9 +45,7 @@
       apps = forAllSystems (system: pkgs: {
         default = {
           type = "app";
-          program = "${
-              self.packages.${system}.default
-            }/bin/open-andes-http-application-service";
+	  program = "${self.packages.${system}.default}/bin/http-application-service";
         };
       });
 
